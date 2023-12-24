@@ -1,3 +1,4 @@
 # PartyRoom.API
 PartyRoomBackend
-docker inspect PartyRoomDBPostgres
+Запуск докера с базой
+`docker inspect PartyRoomDBPostgres`
