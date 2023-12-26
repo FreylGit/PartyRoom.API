@@ -2,6 +2,7 @@ package postgresql
 
 import (
 	"PartyRoom.API/internal/domain"
+	"PartyRoom.API/internal/lib/constants/constants"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -35,13 +36,14 @@ func New(connectionString string) (*Storage, error) {
 	// Создание трех ролей при первом запуске
 	createDefaultRoles(db)
 	log.Println("🚀 Connected Successfully to the Database")
+
 	return &Storage{db: db}, nil
 }
 func createDefaultRoles(db *gorm.DB) {
 	roles := []domain.Role{
-		{Name: "User", UpperName: "USER", LowerName: "user"},
-		{Name: "Admin", UpperName: "ADMIN", LowerName: "admin"},
-		{Name: "Moderator", UpperName: "MODERATOR", LowerName: "moderator"},
+		{Name: constants.UserRole.Name, UpperName: constants.UserRole.UpperName, LowerName: constants.UserRole.LowerName},
+		{Name: constants.AdminRole.Name, UpperName: constants.AdminRole.UpperName, LowerName: constants.AdminRole.LowerName},
+		{Name: constants.ModeratorRole.Name, UpperName: constants.ModeratorRole.UpperName, LowerName: constants.ModeratorRole.LowerName},
 	}
 
 	for _, role := range roles {
