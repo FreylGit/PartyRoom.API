@@ -24,14 +24,14 @@ func GenerateRefreshToken(userId string) string {
 	return str
 }
 
-func GenerateAccessToken(user *domain.User) (string, error) {
+func GenerateAccessToken(user domain.User) (string, error) {
 	cfg, err := config.New(".")
 	if err != nil {
 		return "", err
 	}
 
 	now := time.Now().UTC()
-	expirationTime := now.Add(2 * time.Hour)
+	expirationTime := now.Add(22 * time.Hour)
 	var roleNames []string
 	for i := 0; i < len(user.Roles); i++ {
 		roleNames = append(roleNames, user.Roles[i].Name)

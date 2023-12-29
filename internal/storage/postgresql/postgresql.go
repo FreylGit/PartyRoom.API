@@ -29,6 +29,7 @@ func New(connectionString string) (*Storage, error) {
 	err = db.AutoMigrate(&domain.Role{})
 	err = db.AutoMigrate(&domain.UserRole{})
 	err = db.AutoMigrate(&domain.RefreshToken{})
+	err = db.AutoMigrate(&domain.Tag{})
 	if err != nil {
 		log.Fatal("Migration Failed: \n", err.Error())
 		os.Exit(1)

@@ -22,6 +22,7 @@ type User struct {
 	IsConfirmedEmail bool       `gorm:"type:boolean;default:false"`
 	Roles            []*Role    `gorm:"many2many:user_roles;"`
 	RefreshToken     RefreshToken
+	Tag              []Tag `gorm:"foreignKey:UserID"`
 }
 
 type Role struct {
@@ -45,7 +46,15 @@ type RefreshToken struct {
 	User           *User      `gorm:"foreignKey:UserID"`
 	Token          string     `gorm:"type:varchar(255);not null"`
 	ExpirationDate time.Time  `gorm:"type:time"`
-	CreateDate     string     `grom:"type:time"`
+	CreateDate     time.Time  `grom:"type:time"`
+}
+
+type Tag struct {
+	ID     *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primary_key;"`
+	UserID *uuid.UUID `gorm:"type:uuid;index"`
+	User   *User      `gorm:"foreignKey:UserID"`
+	Name   string     `gorm:"type:varchar(120);not null;"`
+	IsGood bool       `gorm:"type:boolean;default:true"`
 }
 
 func (token *RefreshToken) BeforeCreate(tx *gorm.DB) (err error) {

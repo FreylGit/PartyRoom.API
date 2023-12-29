@@ -5,11 +5,11 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Storage) GetRefreshToken(userId uuid.UUID) (*domain.RefreshToken, error) {
-	var refreshToken *domain.RefreshToken
+func (s *Storage) GetRefreshToken(userId uuid.UUID) (domain.RefreshToken, error) {
+	var refreshToken domain.RefreshToken
 	result := s.db.Where("user_id = ?", userId).First(&refreshToken)
 	if result.Error != nil {
-		return nil, result.Error
+		return refreshToken, result.Error
 	}
 	return refreshToken, nil
 }

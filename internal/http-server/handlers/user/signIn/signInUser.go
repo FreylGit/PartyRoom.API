@@ -1,11 +1,10 @@
 package signIn
 
 import (
-	"PartyRoom.API/internal/domain"
 	"PartyRoom.API/internal/lib/api/response"
-	"PartyRoom.API/internal/service/authService"
 	"github.com/go-chi/render"
 	"net/http"
+	"time"
 )
 
 type Request struct {
@@ -16,8 +15,11 @@ type Request struct {
 type Response struct {
 	AccessToken string `json:"accessToken"`
 }
+type AuthService interface {
+	SignIn(email string, password string) (string, string)
+}
 
-func New(userRepository domain.UserRepository, tokenRepository domain.RefreshTokenRepository) http.HandlerFunc {
+func New(authService AuthService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req Request
 		err := render.DecodeJSON(r.Body, &req)
@@ -27,13 +29,14 @@ func New(userRepository domain.UserRepository, tokenRepository domain.RefreshTok
 			return
 		}
 
-		accessToken, refreshToken := authService.SignIn(userRepository, tokenRepository, req.Email, req.Password)
+		accessToken, refreshToken := authService.SignIn(req.Email, req.Password)
 		response := Response{AccessToken: accessToken}
 		cookie := http.Cookie{
 			Name:     "refreshToken",
 			Value:    refreshToken,
 			HttpOnly: true,
 			Path:     "/",
+			Expires:  time.Now().Add(22 * time.Hour),
 		}
 		http.SetCookie(w, &cookie)
 		render.JSON(w, r, response)

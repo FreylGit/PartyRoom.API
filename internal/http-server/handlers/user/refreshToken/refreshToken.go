@@ -2,8 +2,6 @@ package refreshToken
 
 import (
 	"PartyRoom.API/internal/config"
-	"PartyRoom.API/internal/domain"
-	"PartyRoom.API/internal/service/authService"
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 	"net/http"
@@ -13,8 +11,11 @@ import (
 type Response struct {
 	AccessToken string `json:"accessToken"`
 }
+type AuthService interface {
+	RefreshToken(userId uuid.UUID, token string) string
+}
 
-func New(userRepository domain.UserRepository, tokenRepository domain.RefreshTokenRepository, cfg config.Config) http.HandlerFunc {
+func New(authService AuthService, cfg config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		refreshTokenCookie, err := getRefreshTokenFromCookie(r)
 		if !strings.Contains(refreshTokenCookie, "_") {
@@ -27,13 +28,11 @@ func New(userRepository domain.UserRepository, tokenRepository domain.RefreshTok
 			http.Error(w, "Invalid user id", http.StatusUnauthorized)
 			return
 		}
-		user, err := userRepository.GetUserById(userId)
-		if err != nil {
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
+		accessToken := authService.RefreshToken(userId, refreshTokenCookie)
+		if accessToken == "" {
+			http.Error(w, "Invalid refresh token", http.StatusBadRequest)
 			return
 		}
-
-		accessToken := authService.RefreshToken(tokenRepository, user, refreshTokenCookie)
 		response := Response{AccessToken: accessToken}
 		render.JSON(w, r, response)
 	}

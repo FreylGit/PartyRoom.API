@@ -15,7 +15,7 @@ type Request struct {
 	Phone    string `json:"phone" validate:"required"`
 }
 type UserRepository interface {
-	CreateUser(user domain.User) error
+	SaveUser(user domain.User) error
 }
 
 func New(repository UserRepository) http.HandlerFunc {
@@ -33,7 +33,7 @@ func New(repository UserRepository) http.HandlerFunc {
 			Name:         req.Name,
 			Phone:        req.Phone,
 		}
-		err = repository.CreateUser(newUser)
+		err = repository.SaveUser(newUser)
 		if err != nil {
 			render.JSON(w, r, response.Error(err.Error()))
 			return
